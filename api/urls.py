@@ -1,8 +1,14 @@
 from django.urls import path
 from . import views
+from .auth_views import register_user, login_user
+
+
+
 
 urlpatterns = [
     # Product APIs
+    path('users/register/', register_user),
+    path('users/login/', login_user),
     path('products/', views.get_products),
     path('products/<int:id>/', views.get_product),
     path('products/add/', views.add_product),

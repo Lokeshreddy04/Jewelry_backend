@@ -1,3 +1,5 @@
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Product, Category
@@ -11,6 +13,20 @@ from .serializers import ProductSerializer, CategorySerializer
 @api_view(['GET'])
 def get_products(request):
     products = Product.objects.all()
+
+    search = request.GET.get('search')
+    if search:
+        products = products.filter(name__icontains=search) | products.filter(description__icontains=search)
+
+@api_view(['GET'])
+def get_products(request):
+    products = Product.objects.all()
+
+    # Filters
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    base_metal = request.GET.get('metal')
+    sort = request.GET.get('sort')
 
     # Filters
     min_price = request.GET.get('min_price')
@@ -51,6 +67,7 @@ def get_product(request, id):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_product(request):
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
@@ -60,6 +77,7 @@ def add_product(request):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_product(request, id):
     try:
         product = Product.objects.get(id=id)
@@ -74,6 +92,7 @@ def update_product(request, id):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_product(request, id):
     try:
         product = Product.objects.get(id=id)
